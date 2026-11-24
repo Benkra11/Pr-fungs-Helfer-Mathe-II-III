@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f3d47">
+<meta name="description" content="Abschlussprüfungen Mathematik II nach Themen – mit ausführlichen Lösungen">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prüfungstrainer">
+<title>Prüfungstrainer Mathe 10II/III</title>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+/* Layout: Kopf mit Themenwahl und Filtern, darunter eine Spalte Aufgabenkarten (max. ~860px) */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#18232a; --muted:#5b6a72; --line:#d9e1e0;
+  --accent:#0f6e78; --accent-soft:#dff0f0; --sol:#f7faf6; --sol-line:#cfe3d4; --ok:#2f7d4f;
+  --t-tr:#0f6e78; --t-rg:#7a4fb3; --t-ex:#c2581b; --t-qu:#1d5fb8; --t-za:#a8326e;
+  --font-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11181b; --surface:#182226; --ink:#e6eeee; --muted:#9aaab0; --line:#2b3a3f;
+    --accent:#5cc3cb; --accent-soft:#16363a; --sol:#152520; --sol-line:#28473a; --ok:#6fcf97;
+    --t-tr:#5cc3cb; --t-rg:#b493e6; --t-ex:#f0985f; --t-qu:#7fb0f5; --t-za:#ea7fb5;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11181b; --surface:#182226; --ink:#e6eeee; --muted:#9aaab0; --line:#2b3a3f;
+  --accent:#5cc3cb; --accent-soft:#16363a; --sol:#152520; --sol-line:#28473a; --ok:#6fcf97;
+  --t-tr:#5cc3cb; --t-rg:#b493e6; --t-ex:#f0985f; --t-qu:#7fb0f5; --t-za:#ea7fb5;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font:17px/1.55 var(--font-body);}
+.wrap{max-width:900px; margin:0 auto; padding:28px 20px 80px}
+header h1{font-family:var(--font-display); font-weight:800; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.1; margin:0 0 6px; text-wrap:balance; letter-spacing:-.01em}
+header p.sub{margin:0 0 22px; color:var(--muted)}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; display:grid; gap:14px}
+.panel h2{font:700 .78rem/1 var(--font-body); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 8px}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{appearance:none; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px 7px 10px; font:inherit; font-size:.95rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background .15s, border-color .15s}
+.chip .dot{width:12px; height:12px; border-radius:50%; background:var(--c, var(--accent)); opacity:.35}
+.chip .n{font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{border-color:var(--c, var(--accent)); background:color-mix(in srgb, var(--c, var(--accent)) 12%, var(--surface))}
+.chip[aria-pressed="true"] .dot{opacity:1}
+.chip:hover{border-color:var(--c, var(--accent))}
+.chip:focus-visible,.btn:focus-visible,.solbtn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.row{display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; justify-content:space-between}
+.toggles{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+.toggles label{display:inline-flex; gap:7px; align-items:center; cursor:pointer; font-size:.95rem}
+.toggles input{width:18px; height:18px; accent-color:var(--accent)}
+.btn{appearance:none; border:1.5px solid var(--accent); color:var(--accent); background:transparent; border-radius:8px; padding:6px 12px; font:inherit; font-size:.9rem; cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.summary{margin:22px 2px 12px; color:var(--muted); font-size:.95rem; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
+.summary b{color:var(--ink); font-variant-numeric:tabular-nums}
+.topic-h{font-family:var(--font-display); font-weight:700; font-size:1.35rem; margin:34px 0 12px; display:flex; align-items:center; gap:10px}
+.topic-h .tag{font:700 .8rem/1 var(--font-body); color:var(--surface); background:var(--c); padding:5px 8px; border-radius:6px}
+.card{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--c); border-radius:var(--radius); margin:0 0 18px; overflow:hidden}
+.card-h{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 16px; border-bottom:1px solid var(--line)}
+.card-h .src{font-weight:700}
+.card-h .src small{font-weight:400; color:var(--muted)}
+.pill{font-size:.8rem; border-radius:999px; padding:3px 9px; border:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+.pill.notr{border-color:#d29b2c; color:#9a6b07; background:color-mix(in srgb,#f5c04f 18%, transparent)}
+:root[data-theme="dark"] .pill.notr{color:#f5c04f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.notr{color:#f5c04f}}
+.card-h .sp{flex:1}
+.card-b{padding:14px 16px 6px}
+.intro{display:flex; gap:18px; align-items:flex-start; margin-bottom:6px}
+.intro .txt{flex:1; min-width:0}
+.intro .txt p{margin:0 0 8px}
+.fig{background:#fff; border-radius:8px; padding:6px; border:1px solid var(--line); flex:none; max-width:45%}
+.fig img{display:block; max-width:100%; height:auto}
+.fig.big{max-width:100%; margin:6px auto 10px; width:fit-content}
+.stmt{background:#fff; border-radius:8px; border:1px solid var(--line); padding:8px; margin-bottom:10px}
+.stmt img{display:block; width:100%; max-width:780px; height:auto; margin:0 auto}
+.note{font-size:.88rem; color:var(--muted); margin:0 0 8px}
+.ov{text-decoration:overline; text-decoration-thickness:1px}
+img.inl{height:1.7em; vertical-align:middle; background:#fff; border-radius:3px}
+.sub{border-top:1px dashed var(--line); padding:12px 0 10px; display:grid; grid-template-columns:auto 1fr auto; gap:6px 12px; align-items:baseline}
+.sub:first-of-type{border-top:none}
+.sub .lab{font-weight:700; color:var(--c)}
+.sub .body p{margin:0 0 6px}
+.sub .body p.hint{color:var(--muted); font-style:italic; font-size:.93rem}
+.sub .body p.opt{padding-left:1.2rem}
+.sub .pts{color:var(--muted); font-size:.85rem; white-space:nowrap; font-variant-numeric:tabular-nums}
+.sub .sub-img{background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px; margin:6px 0; width:fit-content; max-width:100%}
+.sub .sub-img img{display:block; max-width:100%; height:auto}
+.sub .body{grid-column:1 / -1; grid-row:2}
+.sub .body:empty{display:none}
+.sub .pts{grid-column:3; grid-row:1}
+.sub .act{grid-column:1 / -1}
+.solbtn{appearance:none; border:none; background:var(--accent-soft); color:var(--accent); font:inherit; font-weight:700; font-size:.92rem; padding:6px 12px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+.solbtn .ar{display:inline-block; transition:transform .2s}
+.solbtn[aria-expanded="true"] .ar{transform:rotate(90deg)}
+.sol{margin-top:10px; background:var(--sol); border:1px solid var(--sol-line); border-radius:10px; padding:14px 18px; display:grid; gap:14px}
+.sol[hidden]{display:none}
+.step{display:block; padding-bottom:12px; border-bottom:1px solid var(--sol-line)}
+.step:last-of-type{border-bottom:none; padding-bottom:0}
+.step .num{float:left; width:1.6rem; height:1.6rem; margin:0 .6rem 0 0; border-radius:50%; background:var(--ok); color:var(--surface); font:700 .8rem/1.6rem var(--font-body); text-align:center}
+.step .ex{font-size:1rem; line-height:1.6; max-width:none}
+.step .ex::after{content:''; display:block; clear:both}
+.step .mx{overflow-x:auto; margin:8px 0 0; padding:6px 12px; background:var(--surface); border-radius:8px; border-left:3px solid var(--ok)}
+.step .mx .katex-display{margin:.2em 0; text-align:left}
+.step .mx .katex-display>.katex{text-align:left}
+.katex .mathnormal{font-family:KaTeX_Main; font-style:normal}
+.katex{font-size:1.08em}
+.solfig{background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px; width:fit-content; max-width:100%}
+.solfig img{display:block; max-width:100%; width:520px; height:auto}
+.solfig figcaption{font-size:.8rem; color:#555; padding:4px 2px 0}
+.empty{padding:40px 10px; text-align:center; color:var(--muted)}
+footer{margin-top:40px; color:var(--muted); font-size:.85rem}
+@media (max-width:640px){
+  .intro{flex-direction:column}
+  .fig{max-width:100%}
+  .card-b{padding:12px 10px 6px}
+  .sol{padding:12px 12px}
+  .step .mx{padding:4px 8px}
+  .katex{font-size:1em}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Prüfungstrainer Mathe 10II/III</h1>
+  <p class="sub">Aufgaben aus den Abschlussprüfungen Mathematik II 2018–2025, sortiert nach Themen. Wähle Themen aus und blende die Lösungen Schritt für Schritt ein.</p>
+</header>
+
+<section class="panel" aria-label="Auswahl">
+  <div>
+    <h2>Themen</h2>
+    <div class="chips" id="topics"></div>
+  </div>
+  <div class="row">
+    <div>
+      <h2>Prüfungsjahr</h2>
+      <div class="chips" id="years"></div>
+    </div>
+    <div class="toggles">
+      <label for="notr"><input type="checkbox" id="notr"> nur ohne Taschenrechner</label>
+      <button class="btn" id="closeAll" type="button">Alle Lösungen zuklappen</button>
+    </div>
+  </div>
+</section>
+
+<div class="summary" id="summary"></div>
+<main id="list"></main>
+<footer>Quelle der Aufgaben: Abschlussprüfungen Mathematik II an bayerischen Realschulen 2018–2025. Lösungswege nach den offiziellen Lösungsmustern, ausführlicher erklärt (2021 Nachtermin: eigene Lösungen).</footer>
+</div>
+
+<script src="data.js"></script>
+<script src="katex/katex.min.js"></script>
+<script>
+(function(){
+const D = window.AP_DATA, IMG = window.AP_IMG || {};
+const MAC = {"\\w":"\\text{∢}\\,","\\s":"\\overline{#1}","\\cm":"\\,\\mathrm{cm}","\\cmq":"\\,\\mathrm{cm}^2","\\cmk":"\\,\\mathrm{cm}^3","\\erg":"\\underline{\\underline{#1}}","\\IR":"\\mathrm{I\\!R}"};
+const state = {topics:new Set(['tr']), years:new Set([2018,2019,2020,2021,2022,2023,2024,2025]), notr:false};
+try{
+  const s = JSON.parse(localStorage.getItem('ap-trainer2')||'null');
+  if(s){ state.topics=new Set(s.topics); state.years=new Set(s.years); state.notr=!!s.notr; }
+}catch(e){}
+function save(){ try{ localStorage.setItem('ap-trainer2', JSON.stringify({topics:[...state.topics], years:[...state.years], notr:state.notr})); }catch(e){} }
+
+const el = (t, a={}, h='') => { const e=document.createElement(t); for(const k in a){ if(k==='class') e.className=a[k]; else e.setAttribute(k,a[k]); } if(h) e.innerHTML=h; return e; };
+const num = s => parseFloat(String(s).replace(',','.'));
+const fmt = n => String(Math.round(n*10)/10).replace('.',',');
+
+function renderInline(node){
+  node.querySelectorAll('.ex').forEach(n=>{
+    n.innerHTML = n.innerHTML.replace(/\\\((.+?)\\\)/g, (m, tex)=>{
+      const t = tex.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+      try{ return katex.renderToString(t,{macros:MAC, throwOnError:false}); }catch(e){ return m; }
+    });
+  });
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function imgTag(name, cls, w){
+  const sz = IMG[name]; const st = w ? ` style="width:${w}px"` : '';
+  return `<img src="img/${name}.png" alt="" loading="lazy"${sz?` width="${sz[0]}" height="${sz[1]}"`:''}${st}>`;
+}
+
+// Chips
+const tBox = document.getElementById('topics');
+D.forEach(t=>{
+  const b = el('button',{class:'chip', type:'button', 'aria-pressed':state.topics.has(t.id), style:`--c:var(--t-${t.id})`},
+    `<span class="dot"></span>${t.short} ${t.name} <span class="n">${t.tasks.length}</span>`);
+  b.onclick=()=>{ state.topics.has(t.id)?state.topics.delete(t.id):state.topics.add(t.id); b.setAttribute('aria-pressed',state.topics.has(t.id)); save(); render(); };
+  tBox.appendChild(b);
+});
+const yBox = document.getElementById('years');
+[2018,2019,2020,2021,2022,2023,2024,2025].forEach(y=>{
+  const b = el('button',{class:'chip', type:'button', 'aria-pressed':state.years.has(y)}, `${y}`);
+  b.onclick=()=>{ state.years.has(y)?state.years.delete(y):state.years.add(y); b.setAttribute('aria-pressed',state.years.has(y)); save(); render(); };
+  yBox.appendChild(b);
+});
+const nt = document.getElementById('notr'); nt.checked = state.notr;
+nt.onchange=()=>{ state.notr=nt.checked; save(); render(); };
+document.getElementById('closeAll').onclick=()=>{
+  document.querySelectorAll('.solbtn[aria-expanded="true"]').forEach(b=>toggle(b,false));
+};
+
+function toggle(btn, open){
+  const box = document.getElementById(btn.getAttribute('aria-controls'));
+  if(open===undefined) open = btn.getAttribute('aria-expanded')!=='true';
+  btn.setAttribute('aria-expanded', open);
+  btn.querySelector('.lbl').textContent = open ? 'Lösung ausblenden' : 'Lösung zeigen';
+  if(open && !box.dataset.done){ fillSol(box); box.dataset.done='1'; }
+  box.hidden = !open;
+}
+function fillSol(box){
+  const sub = JSON.parse(box.dataset.sub);
+  let h=''; let i=1;
+  sub.sol.forEach(s=>{
+    let m='';
+    if(s.m){ try{ m = katex.renderToString(s.m,{displayMode:true, macros:MAC, throwOnError:false}); }catch(e){ m='<code>'+esc(s.m)+'</code>'; } }
+    h += `<div class="step"><span class="num">${i++}</span><div class="ex">${esc(s.t).replace(/\\\\\(/g,'\\(').replace(/&lt;(\/?)(b|sub|sup)&gt;/g,'<$1$2>')}</div>${m?`<div class="mx">${m}</div>`:''}</div>`;
+  });
+  if(sub.solimg){ h += `<figure class="solfig" style="margin:0">${imgTag(sub.solimg)}<figcaption>${sub.solcap||''}</figcaption></figure>`; }
+  box.innerHTML = h; renderInline(box);
+}
+
+let uid=0;
+function card(topic, t){
+  const c = el('article',{class:'card', style:`--c:var(--t-${topic.id})`, id:t.id});
+  const termTxt = t.term;
+  c.appendChild(el('div',{class:'card-h'},
+    `<span class="src">AP ${t.year} <small>· ${termTxt} · Aufgabe ${t.nr}</small></span>`+
+    (t.notr?`<span class="pill notr">✎ ohne Taschenrechner</span>`:'')+
+    `<span class="sp"></span><span class="pill">${t.pts} P</span>`));
+  const b = el('div',{class:'card-b'});
+  if(t.stmt){
+    if(t.note) b.appendChild(el('p',{class:'note'}, t.note));
+    const s = el('div',{class:'stmt'}); t.stmt.forEach(n=>s.insertAdjacentHTML('beforeend', imgTag(n))); b.appendChild(s);
+  } else if(t.intro || t.fig){
+    const it = el('div',{class:'intro'});
+    if(t.intro) it.appendChild(el('div',{class:'txt'}, t.intro));
+    if(t.fig){
+      const w = t.figw ? Math.round(t.figw*42) : null;
+      const f = el('div',{class:'fig'+(t.bigfig?' big':'')}, imgTag(t.fig,'',w));
+      if(t.bigfig){ b.appendChild(it); b.appendChild(f); } else it.appendChild(f);
+    }
+    if(!t.bigfig || !t.fig) b.appendChild(it);
+  }
+  t.subs.forEach(s=>{
+    const id='sol'+(++uid);
+    const d = el('div',{class:'sub'});
+    d.appendChild(el('div',{class:'lab'}, s.label));
+    const body = el('div',{class:'body'}, s.text || '');
+    if(s.img) body.insertAdjacentHTML('beforeend', `<div class="sub-img">${imgTag(s.img)}</div>`);
+    d.appendChild(body);
+    d.appendChild(el('div',{class:'pts'}, s.pts+' P'));
+    const act = el('div',{class:'act'});
+    const btn = el('button',{class:'solbtn', type:'button', 'aria-expanded':'false', 'aria-controls':id}, `<span class="ar">▸</span><span class="lbl">Lösung zeigen</span>`);
+    btn.onclick=()=>toggle(btn);
+    const box = el('div',{class:'sol', id}); box.hidden=true; box.dataset.sub=JSON.stringify(s);
+    act.appendChild(btn); act.appendChild(box); d.appendChild(act);
+    b.appendChild(d);
+  });
+  c.appendChild(b);
+  return c;
+}
+
+function render(){
+  const list = document.getElementById('list'); list.innerHTML='';
+  let nTasks=0, nPts=0;
+  D.forEach(topic=>{
+    if(!state.topics.has(topic.id)) return;
+    const tasks = topic.tasks.filter(t=>state.years.has(t.year) && (!state.notr || t.notr));
+    if(!tasks.length) return;
+    list.appendChild(el('h2',{class:'topic-h', style:`--c:var(--t-${topic.id})`}, `<span class="tag">${topic.short}</span>${topic.name}`));
+    tasks.forEach(t=>{ list.appendChild(card(topic,t)); nTasks++; nPts+=num(t.pts); });
+  });
+  if(!nTasks) list.appendChild(el('p',{class:'empty'},'Keine Aufgaben für diese Auswahl. Wähle oben mindestens ein Thema und ein Prüfungsjahr aus.'));
+  document.getElementById('summary').innerHTML = `<span><b>${nTasks}</b> Aufgaben · <b>${fmt(nPts)}</b> Punkte</span><span>Tipp: Erst selbst rechnen, dann aufklappen.</span>`;
+}
+render();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
